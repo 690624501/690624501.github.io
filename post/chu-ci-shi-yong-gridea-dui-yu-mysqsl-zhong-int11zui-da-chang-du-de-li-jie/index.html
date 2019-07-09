@@ -9,7 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://690624501.github.io/favicon.ico?v=1562666740908">
+<link rel="shortcut icon" href="https://690624501.github.io/favicon.ico?v=1562666813750">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
 <link rel="stylesheet" href="https://690624501.github.io/styles/main.css">
 
@@ -36,7 +36,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://690624501.github.io">
-        <img src="https://690624501.github.io/images/avatar.png?v=1562666740908" class="site-logo">
+        <img src="https://690624501.github.io/images/avatar.png?v=1562666813750" class="site-logo">
         <h1 class="site-title">Gridea</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -136,11 +136,36 @@ INSERT INTO test_int (a, b, c, d, e) VALUES (12345678910, 12345678910, 123456789
 </ul>
 <pre><code>select * from test_int;
 </code></pre>
-<pre><code>| id | a | b | c | d | e |
-|---|---|---|---|--|---|
-| 1 | 1 | 00000000001  | 1  | 00001	 | 1 |
-| 2 | 1234567890 |01234567890  | 1234567890  | 1234567890 | 1234567890 |
-</code></pre>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>a</th>
+<th>b</th>
+<th>c</th>
+<th>d</th>
+<th>e</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>00000000001</td>
+<td>1</td>
+<td>00001</td>
+<td>1</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1234567890</td>
+<td>01234567890</td>
+<td>1234567890</td>
+<td>1234567890</td>
+<td>1234567890</td>
+</tr>
+</tbody>
+</table>
 <p><strong>如果用navicat查询结果是没有显示左边的0，但是导出之后就可以看到了</strong></p>
 <ul>
 <li>结论
