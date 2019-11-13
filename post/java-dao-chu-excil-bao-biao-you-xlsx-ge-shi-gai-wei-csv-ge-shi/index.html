@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>java导出excil报表，由xlsx格式改为csv格式 | Learner</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://690624501.github.io/favicon.ico?v=1573640224446">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://690624501.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://690624501.github.io">
+        <img src="https://690624501.github.io/images/avatar.png?v=1573640224446" class="site-logo">
+        <h1 class="site-title">Learner</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="https://690624501.github.io" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="https://690624501.github.io/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="https://690624501.github.io/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="https://690624501.github.io/post/about/" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      温故而知新
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://690624501.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">java导出excil报表，由xlsx格式改为csv格式</h2>
+            <div class="post-date">2019-11-13</div>
+            
+              <div class="feature-container" style="background-image: url('https://690624501.github.io/post-images/java-dao-chu-excil-bao-biao-you-xlsx-ge-shi-gai-wei-csv-ge-shi.jpg')">
+              </div>
+            
+            <div class="post-content">
+              <p>在做项目的时候，客户都会把数据下载下来，所以一般都会有报表导出的功能，正常的是直接导出为xlsx格式的excil表格，由于博主参与的是停车场项目，在后续项目运行上线的时候，数据量会过大，再去导出的时候会报错 java.lang.IllegalArgumentException: Invalid row number (65536) outside allowable range (0..65535)，然后百度发现：
+excel最大行数，不同版本有所不同。Excel2003版最大行数是65536行。Excel2007开始的版本最大行数是1048576行。
+要不分sheet显示，要不改格式。
+毋庸置疑，博主被要求改格式，好吧，只能改，改成csv文件的格式。</p>
+<!--  more -->
+<p>以上就是后面发生事情的前因。下面就来介绍一下做完之后的经验以及踩过的坑吧。</p>
+<h1 id="报表导出为xlsx格式">报表导出为xlsx格式</h1>
+<p>service层：</p>
+<pre><code>public Workbook export(CarRecordDTO carRecordDTO) throws Exception {
+
+						Workbook workbook = new Workbook();
+            Sheet sheet = workbook.createSheet(&quot;在线车辆数据&quot;);
+            Row row = sheet.createRow(0);
+            row.createCell(1).setCellValue(&quot;车牌照片&quot;);
+            row.createCell(2).setCellValue(&quot;车牌号&quot;);
+            row.createCell(3).setCellValue(&quot;进场时间&quot;);
+            row.createCell(4).setCellValue(&quot;停车时长&quot;);
+            row.createCell(5).setCellValue(&quot;进场闸口&quot;);
+            row.createCell(6).setCellValue(&quot;有无跨场&quot;);
+            row.createCell(7).setCellValue(&quot;有无校正&quot;);
+
+            Date currentDate = new Date();
+            for (int i = 0; i &lt; carRecordList.size(); i++) {
+                CarRecord carRecord = (CarRecord) carRecordList.get(i);
+                row = sheet.createRow(i + 1);
+
+                ExcelUtil.setCellValue(row, 1, carRecord.getEnterPlatePic());
+                ExcelUtil.setCellValue(row, 2, carRecord.getPlateNum());
+                ExcelUtil.setCellValue(row, 3, DateUtil.formatDate(carRecord.getEnterDate(), &quot;yyyy-MM-dd HH:mm&quot;));
+                Date enterDate = carRecord.getEnterDate();
+                Long stopTime = (currentDate.getTime() - enterDate.getTime()) / 60000;
+                ExcelUtil.setCellValue(row, 4, TimeUtils.timeConvert(stopTime.intValue()));
+                ExcelUtil.setCellValue(row, 5, list.get(carRecord.getEnterGate()));
+                if (YES.equals(carRecord.getIsCross())) {
+                    ExcelUtil.setCellValue(row, 6, &quot;有跨场&quot;);
+                } else {
+                    ExcelUtil.setCellValue(row, 6, &quot;无跨场&quot;);
+                }
+
+                if (YES.equals(carRecord.getIsRevise())) {
+                    ExcelUtil.setCellValue(row, 7, &quot;有校正&quot;);
+                } else {
+                    ExcelUtil.setCellValue(row, 7, &quot;无校正&quot;);
+                }
+            }
+						return workbook;
+	｝
+</code></pre>
+<p>controller层：</p>
+<pre><code>  Workbook workbook = carRecordService.export(carRecordDTO);
+	super.writeExcel(&quot;carRecord.xls&quot;,workbook);
+</code></pre>
+<pre><code>protected void writeExcel(String filename, Workbook workbook) throws Exception {
+        this.response.setContentType(&quot;application/octet-stream; charset=iso-8859-1&quot;);
+        StringBuffer contentDisposition = new StringBuffer(&quot;attachment; filename=\&quot;&quot;);
+        contentDisposition.append(filename).append(&quot;\&quot;&quot;);
+        this.response.setHeader(&quot;Content-disposition&quot;, contentDisposition.toString());
+        ServletOutputStream out = this.response.getOutputStream();
+        workbook.write(out);
+        out.flush();
+        out.close();
+    }
+</code></pre>
+<p>上面的代码就可以导出xlsx格式的excil报表了。。是不是很简单。</p>
+<h1 id="报表导出为csv格式">报表导出为csv格式</h1>
+<p>service层：</p>
+<pre><code>public File export(CarRecordDTO carRecordDTO) throws Exception {
+
+List&lt;String&gt; listPark = new ArrayList&lt;&gt;();
+            listPark.add(&quot;车牌照片&quot;);
+            listPark.add(&quot;车牌号&quot;);
+            listPark.add(&quot;进场时间&quot;);
+            listPark.add(&quot;停车时长&quot;);
+            listPark.add(&quot;进场闸口&quot;);
+            listPark.add(&quot;有无跨场&quot;);
+            listPark.add(&quot;有无校正&quot;);
+
+            tempFile =  new File(&quot;cardRecord.csv&quot;);
+
+            CsvWriter csvOutput = new CsvWriter(tempFile.getCanonicalPath(), ',', Charset.forName(&quot;GBK&quot;));
+            csvOutput.setEscapeMode(CsvWriter.ESCAPE_MODE_DOUBLED);
+            // 第一行
+            for (String s : listPark) {
+                csvOutput.write(s);
+            }
+            csvOutput.endRecord();
+            // 循环写出数据
+
+            Date currentDate = new Date();
+            for (CarRecord carRecord : carRecordList) {
+                csvOutput.write(carRecord.getEnterPlatePic());
+                csvOutput.write(carRecord.getPlateNum());
+                csvOutput.write(DateUtil.formatDate(carRecord.getEnterDate(), &quot;yyyy-MM-dd HH:mm&quot;));
+                Date enterDate = carRecord.getEnterDate();
+                Long stopTime = (currentDate.getTime() - enterDate.getTime()) / 60000;
+                csvOutput.write(TimeUtils.timeConvert(stopTime.intValue()));
+                csvOutput.write(list.get(carRecord.getEnterGate()));
+                if (YES.equals(carRecord.getIsCross())) {
+                    csvOutput.write(&quot;有跨场&quot;);
+                } else {
+                    csvOutput.write(&quot;无跨场&quot;);
+                }
+
+                if (YES.equals(carRecord.getIsRevise())) {
+                    csvOutput.write(&quot;有校正&quot;);
+                } else {
+                    csvOutput.write(&quot;无校正&quot;);
+                }
+
+                csvOutput.endRecord();
+            }
+            csvOutput.close();
+						return tempFile;
+		｝
+</code></pre>
+<p>controller层：</p>
+<pre><code>   File tempFile = carRecordService.export(carRecordDTO);
+		java.io.OutputStream out = this.response.getOutputStream();
+
+		this.response.reset();
+		this.response.setContentType(&quot;application/csv; charset=iso-8859-1&quot;);
+		this.response.setHeader(&quot;content-disposition&quot;, &quot;attachment; filename=&quot;+tempFile.getPath());
+		File fileLoad = new java.io.File(tempFile.getCanonicalPath());
+		long fileLength = fileLoad.length();
+		FileInputStream in = new FileInputStream(fileLoad);
+		String length1 = String.valueOf(fileLength);
+
+		byte[] b = new byte[10240];
+		this.response.setHeader(&quot;Content_Length&quot;, length1);
+		int n;
+		while ((n = in.read(b)) != -1) {
+			out.write(b, 0, n); //每次写入out1024字节
+		}
+		in.close();
+		out.close();
+</code></pre>
+<p>这样就可以导出csv格式的报表了，下面就来讲讲踩到的坑和搞的乌龙吧：</p>
+<ul>
+<li>因为要引用import com.csvreader.CsvWriter 包，所以就去找相关的依赖包，然后就去maven官网去搜索，</li>
+</ul>
+<pre><code>&lt;!-- https://mvnrepository.com/artifact/net.sourceforge.javacsv/javacsv --&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;net.sourceforge.javacsv&lt;/groupId&gt;
+      &lt;artifactId&gt;javacsv&lt;/artifactId&gt;
+      &lt;version&gt;2.0&lt;/version&gt;
+    &lt;/dependency&gt;
+</code></pre>
+<p>把这个放进pom.xml文件中，要用的包还是import不进去，然后怀疑是maven的settings.xml没设置好，然后又前前后后叭叭叭的搞了挺久的，还是没有解决，后来实在没有办法了，向同事大神求助，后来经检查
+<img src="https://690624501.github.io/post-images/1573639534049.png" alt="">是把这个按钮不知道什么时候按到了，导致idea离线状态，反正博主已经哭了</p>
+<ul>
+<li>
+<p>在写完代码的时候，在本地测试是没有问题的，生成的excil可以存放65535以上的数据，文档打开也是没有问题的，然后部署到dev环境上测试，发现文件名又不是我改的英文名，格式也是乱了，都在同一个单元格里面，又叭叭叭的找问题，最后定位到应该是前端把文档名写死了，格式也有锁定吧（因为是前后端分离的，我基本上没去看前端代码）</p>
+</li>
+<li>
+<p>因为导出的报表由时间格式的，发现格式有问题，我在代码里面写了是yyyy-MM-dd hh:mm但是没有生效，比如2019-10-03 12:05 就显示为2019-10-3 12:5 反正就是很奇怪，百度上别人说要在前后都加&quot;\t&quot;，我也试过了，没卵用，但是改excil表格里面单元格的格式是可以的；</p>
+</li>
+</ul>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://690624501.github.io/post/chu-ci-shi-yong-gridea-dui-yu-mysqsl-zhong-int11zui-da-chang-du-de-li-jie">
+                  <h3 class="post-title">
+                    初次使用Gridea-对于Mysqsl中Int(11)最大长度的理解
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: 'd92c98c13b83b618a09e',
+        clientSecret: 'f9db8372a4f7ff6cee8b0b83234e33fc66d65685',
+        repo: '690624501.github.io',
+        owner: '690624501',
+        admin: ['690624501'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>
